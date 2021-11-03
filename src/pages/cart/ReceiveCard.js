@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from 'react'
+import Address from './Address'
+
 import './cartstyle.css'
 
 function Receive(props) {
+  // 發票資訊
+  const [receipt, setReceipt] = useState('')
+  //載入
   const [isLoading, setIsLoading] = useState(true)
+  // 使用物件值作為狀態值，儲存所有欄位的值
+  const [fields, setFields] = useState({
+    receiver: '',
+    mobile: '',
+    delivery_address: '台北市',
+    card: '',
+  })
+
+  // 專門用來處理每個欄位的輸入用
+  const handleFieldChange = (e) => {
+    // 1. 從原本的狀態物件拷貝新物件
+    // 2. 在拷貝的新物件上處理
+    // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+    // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7%E5%90%8D
+    const updatedFields = {
+      ...fields,
+      [e.target.name]: e.target.value,
+    }
+    // 3. 設定回原狀態物件
+    setFields(updatedFields)
+  }
+
   useEffect(() => {
     // 先開起載入指示器
     setIsLoading(true)
@@ -75,18 +102,18 @@ function Receive(props) {
       <div class="container pt-5">
         <div class="row justify-content-center ">
           <div class="w875 ">
-            <form class="ml-5 col-12">
+            <form name="form1" class="ml-5 col-12">
               <div class="form-group">
-                <label for="name">收件姓名 :</label>
+                <label for="receiver">收件姓名 :</label>
                 <input
                   type="text"
                   class="form-control col-4 inputstyle"
                   placeholder="姓名"
+                  name="receiver"
+                  value={fields.receiver}
+                  onChange={handleFieldChange}
+                  required
                 />
-                <small class="form-text text-muted">
-                  We'll never share your email with anyone
-                  else.
-                </small>
               </div>
 
               <div class="form-group">
@@ -97,27 +124,38 @@ function Receive(props) {
                   type="number"
                   class="form-control col-4 inputstyle"
                   placeholder="手機"
+                  name="mobile"
+                  value={fields.mobile}
+                  onChange={handleFieldChange}
+                  required
                 />
-                <small class="form-text text-muted">
-                  We'll never share your email with anyone
-                  else.
-                </small>
               </div>
+
               <div class="form-group">
                 <label for="exampleInputEmail1">
                   收貨地址 :
                 </label>
+                <div className="form-inline"></div>
                 <div class="d-flex">
-                  <select class="form-control col-4 mr-4 ">
+                  <Address />
+                  {/* <select class="form-control col-4 mr-4 ">
                     <option selected>-請選擇縣市-</option>
                     <option>...</option>
                   </select>
                   <select class="form-control col-4 ml-5">
                     <option selected>-請選擇區域-</option>
                     <option>...</option>
-                  </select>
+                  </select> */}
                 </div>
-                <input class="form-control col-9 mt-3"></input>
+                <input
+                  class="form-control col-9 mt-3"
+                  type="text"
+                  placeholder="地址"
+                  name="delivery_address"
+                  value={fields.delivery_address}
+                  onChange={handleFieldChange}
+                  required
+                ></input>
               </div>
               <div class="form-group">
                 <label for="exampleInputEmail1">
@@ -148,32 +186,34 @@ function Receive(props) {
         <div class="d-flex justify-content-center">
           <div class="w875 ">
             <div class="form-group ml-5 visa">
-              <label for="name">發票資訊 : </label>
-              <input
-                class="ml-5"
-                type="radio"
-                placeholder="姓名"
-              />
-              <img src="./img/visa_PNG36.png" alt="" />
-              <img src="./img/JCBLOGO.jfif" alt="" />
-              <input
-                class="ml-5 mr-2"
-                type="radio"
-                placeholder="姓名"
-              />
-              <img src="./img/unionpaylogo.jfif" alt="" />
-              <div>
-                <label for="name">信用卡號 :</label>
+              <form name="form2">
+                <label for="name">信用卡: </label>
                 <input
-                  type="number"
-                  class="form-control col-8 inputstyle"
-                  placeholder="卡號"
+                  class="ml-5"
+                  type="radio"
+                  placeholder="姓名"
                 />
-                <small class="form-text text-muted">
-                  We'll never share your email with anyone
-                  else.
-                </small>
-              </div>
+                <img src="./img/visa_PNG36.png" alt="" />
+                <img src="./img/JCBLOGO.jfif" alt="" />
+                <input
+                  class="ml-5 mr-2"
+                  type="radio"
+                  placeholder="姓名"
+                />
+                <img src="./img/unionpaylogo.jfif" alt="" />
+                <div>
+                  <label for="name">信用卡號 :</label>
+                  <input
+                    type="number"
+                    class="form-control col-8 inputstyle"
+                    placeholder="卡號"
+                    name="card"
+                    value={fields.card}
+                    onChange={handleFieldChange}
+                    required
+                  />
+                </div>
+              </form>
             </div>
             <div class="d-flex mr-2 year">
               <div class="col-2 ">
@@ -218,17 +258,36 @@ function Receive(props) {
         <div class="d-flex justify-content-center">
           <div class="w875 ">
             <div class="form-group ml-5">
-              <label for="name">發票資訊 : </label>
+              <label
+                for="name"
+                onClick={() => {
+                  props.setDatacard(fields)
+                }}
+              >
+                發票資訊 :{' '}
+              </label>
               <input
                 class="ml-5"
                 type="radio"
                 placeholder="姓名"
+                value="電子發票"
+                checked={receipt === '電子發票'}
+                onChange={(e) => {
+                  setReceipt(e.target.value)
+                }}
               />
               <label for="">電子發票</label>
               <input
                 class="ml-5"
                 type="radio"
                 placeholder="姓名"
+                value="公司索取電子發票證明聯"
+                checked={
+                  receipt === '公司索取電子發票證明聯'
+                }
+                onChange={(e) => {
+                  setReceipt(e.target.value)
+                }}
               />
               <label for="">公司索取電子發票證明聯</label>
             </div>

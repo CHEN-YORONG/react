@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
 function Cart() {
-  // [{cat1:'a', cat2:'XXXX', cat3:'123'}]
-  // const [filter, setFilter] = useState([])
-
-  // // http://xxx.com/getdata/?color=red,white&ids=2,3,5
-  // const [colorArray, setColorArray] = useState([1, 3, 5])
-  // const [filterCat2, setFilterCat2] = useState([])
-  // const [filterCat3, setFilterCat3] = useState([])
-  // const [filterCat4, setFilterCat4] = useState([])
-  // const [filterCat5, setFilterCat5] = useState([])
-
-  // 'color='+ colorArray.join(',')
-
   const [mycart, setMycart] = useState([])
   const [dataLoading, setDataLoading] = useState(false)
   const [mycartDisplay, setMycartDisplay] = useState([])
@@ -23,7 +11,13 @@ function Cart() {
 
     const newCart = localStorage.getItem('cart') || '[]'
 
-    console.log(JSON.parse(newCart))
+    // console.log(JSON.parse(newCart))
+
+    // const newCart = localStorage.getItem('cart') || '[]'
+    // console.log('newCart[0]:',newCart[0]);
+    // console.log('JSON.parse(newCart):',JSON.parse(newCart))
+    // var cartArr=JSON.parse(newCart)
+    // setMycart(JSON.parse(newCart))
 
     setMycart(JSON.parse(newCart))
   }
@@ -61,7 +55,7 @@ function Cart() {
       }
     }
 
-    console.log(newMycartDisplay)
+    // console.log(newMycartDisplay)
     setMycartDisplay(newMycartDisplay)
   }, [mycart])
 
@@ -70,7 +64,7 @@ function Cart() {
     item,
     isAdded = true
   ) => {
-    console.log(item, isAdded)
+    // console.log(item, isAdded)
     const currentCart =
       JSON.parse(localStorage.getItem('cart')) || []
 
@@ -79,7 +73,7 @@ function Cart() {
       (v) => v.id === item.id
     )
 
-    console.log('index', index)
+    // console.log('index:', index)
     // found: index! == -1
     if (index > -1) {
       isAdded
@@ -87,6 +81,24 @@ function Cart() {
         : currentCart[index].amount--
     }
 
+    localStorage.setItem(
+      'cart',
+      JSON.stringify(currentCart)
+    )
+
+    // 設定資料
+    setMycart(currentCart)
+  }
+
+  const deleteCartToLocalStorage = (item) => {
+    const currentCart =
+      JSON.parse(localStorage.getItem('cart')) || []
+
+    const index = currentCart.findIndex(
+      (v) => v.id === item.id
+    )
+    currentCart.splice(index,1)
+      console.log('index',index)
     localStorage.setItem(
       'cart',
       JSON.stringify(currentCart)
@@ -180,7 +192,7 @@ function Cart() {
                         <td className="d-flex">
                           <div>
                             <img
-                              src="./img/pd.jpg"
+                              src="./img/PD.jpg"
                               alt=""
                             />
                           </div>
@@ -223,11 +235,15 @@ function Cart() {
                           {item.amount * item.price}
                         </td>
                         <td className="text-center">
-                          <button onClick="localStorage.removeItem(cart.id[0])">
+                          <button
+                            onClick={() =>
+                              deleteCartToLocalStorage(item)
+                            }
+                          >
                             <i className="fas fa-trash"></i>
                           </button>
                         </td>
-                        {console.log(localStorage)}
+                        {/* {console.log(localStorage)} */}
                       </tr>
                     </>
                   )
@@ -242,16 +258,6 @@ function Cart() {
           <p>小計金額 : {sum(mycartDisplay)}</p>
         </div>
       </div>
-      {/* <div className="container mt-5 pt-4">
-      <div className="row justify-content-center">
-        <button className="btn">
-          <span>繼續購物</span>
-        </button>
-        <button className="btn">
-          <span>結帳</span>
-        </button>
-      </div>
-    </div> */}
       <div className="mb-5"></div>
     </>
   )

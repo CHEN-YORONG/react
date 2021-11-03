@@ -8,6 +8,8 @@ import ReceiveCard from './ReceiveCard'
 import CheckOrder from './CheckOrder'
 import ScrollToTop from '../../components/ScrollToTop'
 function OrderSteps(props) {
+  const [datacard, setDatacard] = useState({})
+  const [paydata, setPaydata] = useState()
   const [step, setStep] = useState(1)
 
   const cart = (
@@ -20,21 +22,21 @@ function OrderSteps(props) {
   const shippingForm = (
     <>
       {/* <h2>運送表單</h2> */}
-      <Transport />
+      <Transport setPaydata={setPaydata} />
     </>
   )
 
   const paymentForm = (
     <>
       {/* <h2>付款表單</h2> */}
-      <ReceiveCard />
+      <ReceiveCard setDatacard={setDatacard} />
     </>
   )
 
   const orderDetail = (
     <>
       {/* <h2>訂購詳細</h2> */}
-      <CheckOrder />
+      <CheckOrder paydata={paydata} datacard={datacard} />
     </>
   )
 
@@ -52,7 +54,9 @@ function OrderSteps(props) {
         return cart
     }
   }
-
+  {
+    console.log('datacard:', datacard)
+  }
   const changeStep = (isAdded = true) => {
     if (isAdded && step < 4) setStep(step + 1)
     if (!isAdded && step > 1) setStep(step - 1)
@@ -60,13 +64,11 @@ function OrderSteps(props) {
 
   return (
     <>
-    
-      <div className="mt-5"></div>
-      <div>
+      <div className="mt-5 "></div>
+      <div className="mb-5">
         {switchStep(step)}
         <div class="container">
           <div class="row justify-content-center">
-            
             {step !== 1 && (
               <button
                 className="btn"

@@ -3,6 +3,7 @@ import { Modal, Button } from 'react-bootstrap'
 import { withRouter } from 'react-router-dom'
 import axios from 'axios'
 function ProductList(props) {
+  const { cartCount, setCartCount } = props
   let [data, setData] = useState({})
   let [totalRows, setTotalRows] = useState(0)
   const [mycart, setMycart] = useState([])
@@ -65,13 +66,15 @@ function ProductList(props) {
   )
   useEffect(() => {
     ;(async () => {
-      let r = await axios.get('http://localhost:3001/product/?page=1')
-      console.log(r);
+      let r = await axios.get(
+        'http://localhost:3001/product/?page=1'
+      )
+      console.log(r)
       // let r = await fetch(
       //   'http://localhost:3001/product/?page=1'
       // )
       // let j = await r.json()
-      if (r.status=200) {
+      if ((r.status = 200)) {
         setTotalRows(r.data.totalRows)
         setData(r.data)
       }
@@ -87,7 +90,7 @@ function ProductList(props) {
                 return (
                   <div className="card col-4">
                     <img
-                      src="https://via.placeholder.com/250x150"
+                      src="./img/PD.jpg"
                       className="card-img-top"
                       alt="..."
                     />
@@ -115,7 +118,10 @@ function ProductList(props) {
                             name: el.name,
                             amount: 1,
                             price: el.price,
+                            image: el.image,
                           })
+                          // 每次一按加入，選單列購物數量+1
+                          setCartCount(cartCount + 1)
                         }}
                       >
                         <span>加入購物車</span>

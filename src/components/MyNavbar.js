@@ -5,7 +5,7 @@ import './navstyle.css'
 import { NavLink } from 'react-router-dom'
 
 function MyNavbar(props) {
-  const { auth } = props
+  const { auth, cartCount } = props
 
   return (
     <>
@@ -106,13 +106,15 @@ function MyNavbar(props) {
               href="#memes"
             >
               <p>
-                <i class="fas fa-shopping-cart"></i>
+                <i class="fas fa-shopping-cart"></i>{' '}
+                <span className="badge badge-light">
+                  {cartCount}
+                </span>
               </p>
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
-      
     </>
   )
 }

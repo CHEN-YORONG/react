@@ -2,97 +2,20 @@ import React, { useState, useEffect } from 'react'
 import './cartstyle.css'
 
 function Transport(props) {
-  const [dataLoading, setDataLoading] = useState(false)
-  const [mycart, setMycart] = useState([])
-  const [mycartDisplay, setMycartDisplay] = useState([])
-  // 付款方式
-  const [pay, setPay] = useState('')
-  // 下拉選單 運送地區
-  const [selectedOption, setSelectedOption] = useState('')
-  function getCartFromLocalStorage() {
-    // 開啟載入的指示圖示
-    setDataLoading(true)
-
-    const newCart = localStorage.getItem('cart') || '[]'
-
-    console.log(JSON.parse(newCart))
-
-    setMycart(JSON.parse(newCart))
-  }
-
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
-    getCartFromLocalStorage()
+    // 先開起載入指示器
+    setIsLoading(true)
+
+    // 模擬和伺服器要資料
+    // 最後設定到狀態中
+    // setStudents(data)
+
+    // 3秒後關閉指示器
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 3000)
   }, [])
-  useEffect(() => {
-    setTimeout(() => setDataLoading(false), 1000)
-
-    // mycartDisplay運算
-    let newMycartDisplay = []
-
-    //尋找mycartDisplay
-    for (let i = 0; i < mycart.length; i++) {
-      //尋找mycartDisplay中有沒有此mycart[i].id
-      //有找到會返回陣列成員的索引值
-      //沒找到會返回-1
-      const index = newMycartDisplay.findIndex(
-        (value) => value.id === mycart[i].id
-      )
-      //有的話就數量+1
-      if (index !== -1) {
-        //每次只有加1個數量
-        //newMycartDisplay[index].amount++
-        //假設是加數量的
-        newMycartDisplay[index].amount += mycart[i].amount
-      } else {
-        //沒有的話就把項目加入，數量為1
-        const newItem = { ...mycart[i] }
-        newMycartDisplay = [...newMycartDisplay, newItem]
-      }
-    }
-
-    console.log(newMycartDisplay)
-    setMycartDisplay(newMycartDisplay)
-  }, [mycart])
-
-  // 更新購物車中的商品數量
-  const updateCartToLocalStorage = (
-    item,
-    isAdded = true
-  ) => {
-    console.log(item, isAdded)
-    const currentCart =
-      JSON.parse(localStorage.getItem('cart')) || []
-
-    // find if the product in the localstorage with its id
-    const index = currentCart.findIndex(
-      (v) => v.id === item.id
-    )
-
-    console.log('index', index)
-    // found: index! == -1
-    if (index > -1) {
-      isAdded
-        ? currentCart[index].amount++
-        : currentCart[index].amount--
-    }
-
-    localStorage.setItem(
-      'cart',
-      JSON.stringify(currentCart)
-    )
-
-    // 設定資料
-    setMycart(currentCart)
-  }
-
-  // 計算總價用的函式
-  const sum = (items) => {
-    let total = 0
-    for (let i = 0; i < items.length; i++) {
-      total += items[i].amount * items[i].price
-    }
-    return total
-  }
 
   const spinner = (
     <>
@@ -154,24 +77,20 @@ function Transport(props) {
             <select
               className="ml-3 p-1  form-select form-select-lg mb-3 rongbodybg"
               aria-label=".form-select-lg example"
-              value={selectedOption}
-              onChange={(e) => {
-                setSelectedOption(e.target.value)
-              }}
             >
-              <option value="">請選擇</option>
-              <option value="台灣及離島">台灣及離島</option>
-              <option value="日本">日本</option>
-              <option value="韓國">韓國</option>
-              <option value="中國大陸">中國大陸</option>
+              <option selected className="">
+                台灣及離島
+              </option>
+              <option value="1">日本</option>
+              <option value="2">韓國</option>
+              <option value="3">中國大陸</option>
             </select>
           </div>
-          {/* <div className="rongproducttype d-flex .select rongradiostyle">
+          <div className="rongproducttype d-flex .select rongradiostyle">
             <input
               className="mt-2"
               type="radio"
               name="delivery"
-              value="購物金全額折抵"
             />
             <label for="">
               <p>
@@ -182,17 +101,12 @@ function Transport(props) {
                 </span>
               </p>
             </label>
-          </div> */}
+          </div>
           <div className="rongproducttype d-flex .select rongradiostyle">
             <input
               className="mt-2"
               type="radio"
               name="delivery"
-              value="宅配到貨付款"
-              checked={pay === '宅配到貨付款'}
-              onChange={(e) => {
-                setPay(e.target.value)
-              }}
             />
             <label for="">
               <p>
@@ -209,11 +123,6 @@ function Transport(props) {
               className="mt-2"
               type="radio"
               name="delivery"
-              value="7-11超商取貨"
-              checked={pay === '7-11超商取貨'}
-              onChange={(e) => {
-                setPay(e.target.value)
-              }}
             />
             <label for="">
               <p>
@@ -230,11 +139,6 @@ function Transport(props) {
               className="mt-2"
               type="radio"
               name="delivery"
-              value="信用卡"
-              checked={pay === '信用卡'}
-              onChange={(e) => {
-                setPay(e.target.value)
-              }}
             />
             <label for="">
               <p>
@@ -273,43 +177,69 @@ function Transport(props) {
                     <th scope="col" className="text-center">
                       小計
                     </th>
-
+                    <th scope="col" className="text-center">
+                      刪除
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mycartDisplay.map((item, index) => {
-                    return (
-                      <>
-                        <tr>
-                          <td className="d-flex">
-                            <div>
-                              <img
-                                src="./img/pd.jpg"
-                                alt=""
-                              />
-                            </div>
-                            <div className="ml-5">
-                              {item.name}
-                            </div>
-                          </td>
-                          <td className="text-center">
-                            黃 over 100cm{' '}
-                          </td>
-                          <td className="text-center">
-                            {' '}
-                            {item.amount}
-                          </td>
-                          <td className="text-center">
-                            {item.price}
-                          </td>
-                          <td className="text-center">
-                            {item.amount * item.price}
-                          </td>
-                          {console.log(localStorage)}
-                        </tr>
-                      </>
-                    )
-                  })}
+                  <tr>
+                    <td className="d-flex">
+                      <div>
+                        <img src="./img/pd.jpg" alt="" />
+                      </div>
+                      <div className="ml-5">
+                        Bumblebee Cans
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      黃 over 100cm{' '}
+                    </td>
+                    <td className="text-center">1</td>
+                    <td className="text-center">200</td>
+                    <td className="text-center">200</td>
+                    <td className="text-center">
+                      <i className="fas fa-trash"></i>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="d-flex">
+                      <div>
+                        <img src="./img/pd.jpg" alt="" />
+                      </div>
+                      <div className="ml-5">
+                        <p> Bumblebee Cans</p>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      黃 over 100cm{' '}
+                    </td>
+                    <td className="text-center">1</td>
+                    <td className="text-center">200</td>
+                    <td className="text-center">200</td>
+                    <td className="text-center">
+                      <i className="fas fa-trash"></i>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="d-flex">
+                      <div>
+                        <img src="./img/pd.jpg" alt="" />
+                      </div>
+                      <div className="ml-5">
+                        Bumblebee Cans
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      黃 over 100cm{' '}
+                    </td>
+                    <td className="text-center">1</td>
+                    <td className="text-center">200</td>
+                    <td className="text-center">200</td>
+                    <td className="text-center">
+                      <i className="fas fa-trash"></i>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -322,7 +252,7 @@ function Transport(props) {
                 <p>購物金</p>
               </div>
               <div className="ml-5">
-                <p>NT.{sum(mycartDisplay)}</p>
+                <p>NT.298</p>
                 <p>NT.0</p>
                 <p>NT.0</p>
               </div>
@@ -332,13 +262,7 @@ function Transport(props) {
                 <p>應付金額</p>
               </div>
               <div className="ml-5  rongsettotal">
-                <span
-                  onClick={() => {
-                    props.setPaydata(pay)
-                  }}
-                >
-                  NT.{sum(mycartDisplay)}
-                </span>
+                <span>NT.298</span>
               </div>
             </div>
           </div>
@@ -355,7 +279,7 @@ function Transport(props) {
       <div className="mb-5"></div>
     </>
   )
-  return <>{dataLoading ? spinner : display}</>
+  return <>{isLoading ? spinner : display}</>
 }
 
 export default Transport

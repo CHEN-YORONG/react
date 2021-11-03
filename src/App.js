@@ -4,7 +4,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 // 頁面用元件
 import Home from './pages/Home'
@@ -37,12 +37,27 @@ import MultiLevelBreadcrumb from './components/MultiLevelBreadcrumb'
 
 function App() {
   const [auth, setAuth] = useState(false)
+  const [cartCount, setCartCount] = useState(0)
+
+  useEffect(() => {
+    // // 問伺服器是否有會員登入
+    // // 如果有登入，設定auth為true
+    // setAuth(true)
+
+    //請localstorage中的購物車數量
+    const myCart = localStorage.getItem('cart')
+      ? JSON.parse(localStorage.getItem('cart'))
+      : []
+
+    // 設定為陣列的長度(成員數量)
+    setCartCount(myCart.length)
+  }, [])
 
   return (
     <Router>
       <>
         {/* LOGO+標題+導覽列+上方選單 */}
-        <MyNavbar auth={auth} />
+        <MyNavbar auth={auth} cartCount={cartCount} />
         {/* 主內容區 */}
         <MainContent>
           <MultiLevelBreadcrumb />
@@ -55,7 +70,10 @@ function App() {
                 <Cart />
               </Route>
               <Route path="/productlist">
-                <ProductList />
+                <ProductList
+                  cartCount={cartCount}
+                  setCartCount={setCartCount}
+                />
               </Route>
               <Route path="/order-steps">
                 <OrderStep />

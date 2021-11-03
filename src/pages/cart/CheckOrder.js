@@ -2,21 +2,63 @@ import React, { useState, useEffect } from 'react'
 import './cartstyle.css'
 
 function CheckOrder(props) {
-  const [isLoading, setIsLoading] = useState(true)
+  // const [isLoading, setIsLoading] = useState(true)
+  const [dataLoading, setDataLoading] = useState(false)
+  const [mycart, setMycart] = useState([])
+  const [mycartDisplay, setMycartDisplay] = useState([])
   useEffect(() => {
-    // 先開起載入指示器
-    setIsLoading(true)
+    setTimeout(() => setDataLoading(false), 1000)
 
-    // 模擬和伺服器要資料
-    // 最後設定到狀態中
-    // setStudents(data)
+    // mycartDisplay運算
+    let newMycartDisplay = []
 
-    // 3秒後關閉指示器
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+    //尋找mycartDisplay
+    for (let i = 0; i < mycart.length; i++) {
+      //尋找mycartDisplay中有沒有此mycart[i].id
+      //有找到會返回陣列成員的索引值
+      //沒找到會返回-1
+      const index = newMycartDisplay.findIndex(
+        (value) => value.id === mycart[i].id
+      )
+      //有的話就數量+1
+      if (index !== -1) {
+        //每次只有加1個數量
+        //newMycartDisplay[index].amount++
+        //假設是加數量的
+        newMycartDisplay[index].amount += mycart[i].amount
+      } else {
+        //沒有的話就把項目加入，數量為1
+        const newItem = { ...mycart[i] }
+        newMycartDisplay = [...newMycartDisplay, newItem]
+      }
+    }
+
+    console.log(newMycartDisplay)
+    setMycartDisplay(newMycartDisplay)
+  }, [mycart])
+
+  function getCartFromLocalStorage() {
+    // 開啟載入的指示圖示
+    setDataLoading(true)
+
+    const newCart = localStorage.getItem('cart') || '[]'
+
+    console.log(JSON.parse(newCart))
+
+    setMycart(JSON.parse(newCart))
+  }
+  useEffect(() => {
+    getCartFromLocalStorage()
   }, [])
 
+  // 計算總價用的函式
+  const sum = (items) => {
+    let total = 0
+    for (let i = 0; i < items.length; i++) {
+      total += items[i].amount * items[i].price
+    }
+    return total
+  }
   const spinner = (
     <>
       <div
@@ -84,40 +126,35 @@ function CheckOrder(props) {
                   <th scope="col" class="text-center">
                     商品單價
                   </th>
+                  <th scope="col" class="text-center">
+                    小計
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td class="d-flex">
-                    <div>
-                      <img src="./img/pd.jpg" alt="" />
-                    </div>
-                    <div class="ml-5">Bumblebee Cans</div>
-                  </td>
-                  <td class="text-center">1</td>
-                  <td class="text-center">$99</td>
-                </tr>
-                <tr>
-                  <td class="d-flex">
-                    <div>
-                      <img src="./img/pd.jpg" alt="" />
-                    </div>
-                    <div class="ml-5">Bumblebee Cans</div>
-                  </td>
-                  <td class="text-center">1</td>
-                  <td class="text-center">$99</td>
-                </tr>
-                <tr>
-                  <td class="d-flex">
-                    <div>
-                      <img src="./img/pd.jpg" alt="" />
-                    </div>
-                    <div class="ml-5">Bumblebee Cans</div>
-                  </td>
-                  <td class="text-center">1</td>
-                  <td class="text-center">$99</td>
-                </tr>
-                <div></div>
+                {mycartDisplay.map((item, index) => {
+                  return (
+                    <tr>
+                      <td class="d-flex">
+                        <div>
+                          <img src="./img/pd.jpg" alt="" />
+                        </div>
+                        <div class="ml-5">
+                        {item.name}
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        {item.amount}
+                      </td>
+                      <td class="text-center">
+                        {item.price}
+                      </td>
+                      <td className="text-center">
+                        {item.amount * item.price}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
             <div class="borderbottom"></div>
@@ -129,7 +166,7 @@ function CheckOrder(props) {
                   <p>購物金</p>
                 </div>
                 <div class="ml-5 ">
-                  <p>NT.298</p>
+                  <p>NT.{sum(mycartDisplay)}</p>
                   <p>NT.0</p>
                   <p>NT.0</p>
                 </div>
@@ -139,7 +176,7 @@ function CheckOrder(props) {
                   <p>應付金額</p>
                 </div>
                 <div class="ml-5  rongsettotal">
-                  <span>NT.298</span>
+                  <span>NT.{sum(mycartDisplay)}</span>
                 </div>
               </div>
             </div>
@@ -198,7 +235,7 @@ function CheckOrder(props) {
   return (
     <>
       <h1>學生資料</h1>
-      {isLoading ? spinner : display}
+      {dataLoading ? spinner : display}
     </>
   )
 }
