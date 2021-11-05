@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import './cartstyle.css'
-
 function CheckOrder(props) {
   // const [isLoading, setIsLoading] = useState(true)
+
   const [dataLoading, setDataLoading] = useState(false)
+  const [member, setMember] = useState([])
   const [mycart, setMycart] = useState([])
   const [mycartDisplay, setMycartDisplay] = useState([])
   useEffect(() => {
@@ -32,10 +33,21 @@ function CheckOrder(props) {
         newMycartDisplay = [...newMycartDisplay, newItem]
       }
     }
-
-    console.log(newMycartDisplay)
+    // console.log('props.paydata', props.paydata)
+    // console.log(newMycartDisplay)
     setMycartDisplay(newMycartDisplay)
   }, [mycart])
+  // console.log('member', member)
+  function getMemberLocalStorage() {
+    // 開啟載入的指示圖示
+    setDataLoading(true)
+
+    const newMember = localStorage.getItem('member') || '[]'
+
+    // console.log(JSON.parse(newMember))
+
+    setMember(JSON.parse(newMember))
+  }
 
   function getCartFromLocalStorage() {
     // 開啟載入的指示圖示
@@ -43,12 +55,13 @@ function CheckOrder(props) {
 
     const newCart = localStorage.getItem('cart') || '[]'
 
-    console.log(JSON.parse(newCart))
+    // console.log(JSON.parse(newCart))
 
     setMycart(JSON.parse(newCart))
   }
   useEffect(() => {
     getCartFromLocalStorage()
+    getMemberLocalStorage()
   }, [])
 
   // 計算總價用的函式
@@ -132,16 +145,14 @@ function CheckOrder(props) {
                 </tr>
               </thead>
               <tbody>
-                {mycartDisplay.map((item, index) => {
+                {mycart.map((item, index) => {
                   return (
                     <tr>
                       <td class="d-flex">
                         <div>
                           <img src="./img/pd.jpg" alt="" />
                         </div>
-                        <div class="ml-5">
-                        {item.name}
-                        </div>
+                        <div class="ml-5">{item.name}</div>
                       </td>
                       <td class="text-center">
                         {item.amount}
@@ -187,34 +198,45 @@ function CheckOrder(props) {
             <div class="w875">
               <form class="ml-5 rongorderdetail">
                 <div class="form-group">
+                  <label for="name">會員帳號 : </label>
+                  <span>{member.email}</span>
+                </div>
+                <div class="form-group">
+                  <label for="name">會員暱稱 : </label>
+                  <span>{member.nickname}</span>
+                </div>
+                <div class="form-group">
                   <label for="name">訂單編號 : </label>
-                  <span class="red">202109210001</span>
+                  <span class="red">
+                    {props.datacard.order_id}
+                  </span>
                 </div>
                 <div class="form-group">
                   <label for="name">訂購日期 : </label>
-                  <span>20210921</span>
+                  <span>{props.datacard.date}</span>
                 </div>
                 <div class="form-group">
                   <label for="name">付款方式 : </label>
-                  <span>到貨付款</span>
+                  <span>{props.paydata}</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="name">收件人姓名 : </label>
+                  <span>{props.datacard.receiver}</span>
                 </div>
                 <div class="form-group">
-                  <label for="name">會員帳號 : </label>
-                  <span>aaa@gmail.com</span>
+                  <label for="name">收件人手機 : </label>
+                  <span>{props.datacard.mobile}</span>
                 </div>
                 <div class="form-group">
-                  <label for="name">會員姓名 : </label>
-                  <span>王小名</span>
-                </div>
-                <div class="form-group">
-                  <label for="name">會員手機 : </label>
-                  <span>0911123456</span>
-                </div>
-                <div class="form-group">
-                  <label for="name">會員地址 : </label>
+                  <label for="name">收件人地址 : </label>
                   <span>
-                    台北市大安區和平東路二段106號11樓
+                    {props.datacard.delivery_address}
                   </span>
+                </div>
+                <div class="form-group">
+                  <label for="name">信用卡號 : </label>
+                  <span>{props.datacard.card}</span>
                 </div>
               </form>
             </div>

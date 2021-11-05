@@ -9,13 +9,30 @@ function Receive(props) {
   //載入
   const [isLoading, setIsLoading] = useState(true)
   // 使用物件值作為狀態值，儲存所有欄位的值
+  var Today = new Date()
+  var date =
+    Today.getFullYear() +
+    '-' +
+    (Today.getMonth() + 1) +
+    '-' +
+    Today.getDate()
+  var date2 =
+    Today.getFullYear() +
+    '' +
+    (Today.getMonth() + 1) +
+    '' +
+    Today.getDate() +
+    ''
+  var rnd = Math.floor(Math.random() * 1000)
   const [fields, setFields] = useState({
     receiver: '',
     mobile: '',
     delivery_address: '台北市',
     card: '',
+    date: date,
+    order_id: date2 + rnd,
   })
-
+  // console.log()
   // 專門用來處理每個欄位的輸入用
   const handleFieldChange = (e) => {
     // 1. 從原本的狀態物件拷貝新物件

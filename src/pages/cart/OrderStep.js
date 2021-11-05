@@ -1,3 +1,4 @@
+import { withRouter } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
 import './cartstyle.css'
 import Cart from './Cart'
@@ -6,11 +7,15 @@ import Transport from './Transport'
 import ReceiveCard from './ReceiveCard'
 // import OrderList from './pages/OrderList'
 import CheckOrder from './CheckOrder'
-import ScrollToTop from '../../components/ScrollToTop'
+
 function OrderSteps(props) {
+  const { auth } = props
+  const [member, setMember] = useState([])
   const [datacard, setDatacard] = useState({})
   const [paydata, setPaydata] = useState()
+  const [mycart, setMycart] = useState([])
   const [step, setStep] = useState(1)
+  const [mycartDisplay, setMycartDisplay] = useState([])
 
   const cart = (
     <>
@@ -40,6 +45,103 @@ function OrderSteps(props) {
     </>
   )
 
+  function getMemberLocalStorage() {
+    // 開啟載入的指示圖示
+
+    const newMember = localStorage.getItem('member') || '[]'
+
+    // console.log(JSON.parse(newMember))
+
+    setMember(JSON.parse(newMember))
+  }
+  function getCartFromLocalStorage() {
+    // 開啟載入的指示圖示
+
+    const newCart = localStorage.getItem('cart') || '[]'
+
+    // console.log(JSON.parse(newCart))
+
+    setMycart(JSON.parse(newCart))
+  }
+  // 計算總價用的函式
+  const sum = (items) => {
+    let total = 0
+    for (let i = 0; i < items.length; i++) {
+      total += items[i].amount * items[i].price
+    }
+    return total
+
+  }
+  useEffect(() => {
+    getCartFromLocalStorage()
+    getMemberLocalStorage()
+  }, [])
+  const onSubmit = async () => {
+    //json
+    //  `member_sid`, `name`, `mobile`, `orderprice`, `delivery`, `receiver`, `delivery_address`, `card`,
+    const dataObj = {
+      member_sid: member.id,
+      nickname: member.nickname,
+      mobile: datacard.mobile,
+      orderprice: 1424,
+      delivery: paydata,
+      receiver: datacard.receiver,
+      delivery_address: datacard.delivery_address,
+      card: datacard.card,
+    }
+    const r = await fetch('http://localhost:3001/order', {
+      method: 'POST',
+      body: JSON.stringify(dataObj),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await r.json()
+    console.log(data)
+
+    localStorage.removeItem('cart')
+    alert('謝謝惠顧')
+    props.history.push('/about')
+  }
+  const f = () => {
+    {
+      alert('請先登入')
+      props.history.push('/about')
+    }
+  }
+  useEffect(() => {
+    // mycartDisplay運算
+    let newMycartDisplay = []
+
+    //尋找mycartDisplay
+    for (let i = 0; i < mycart.length; i++) {
+      //尋找mycartDisplay中有沒有此mycart[i].id
+      //有找到會返回陣列成員的索引值
+      //沒找到會返回-1
+      const index = newMycartDisplay.findIndex(
+        (value) => value.id === mycart[i].id
+      )
+      //有的話就數量+1
+      if (index !== -1) {
+        //每次只有加1個數量
+        //newMycartDisplay[index].amount++
+        //假設是加數量的
+        newMycartDisplay[index].amount += mycart[i].amount
+      } else {
+        //沒有的話就把項目加入，數量為1
+        const newItem = { ...mycart[i] }
+        newMycartDisplay = [...newMycartDisplay, newItem]
+      }
+    }
+
+    // console.log(newMycartDisplay)
+    setMycartDisplay(newMycartDisplay)
+  }, [mycart])
+  useEffect(() => {
+    if (!auth) {
+      f()
+    }
+  }, [])
   const switchStep = (step) => {
     switch (step) {
       case 1:
@@ -55,14 +157,14 @@ function OrderSteps(props) {
     }
   }
   {
-    console.log('datacard:', datacard)
+    // console.log('datacard:', datacard)
   }
   const changeStep = (isAdded = true) => {
     if (isAdded && step < 4) setStep(step + 1)
     if (!isAdded && step > 1) setStep(step - 1)
   }
 
-  return (
+  const login = (
     <>
       <div className="mt-5 "></div>
       <div className="mb-5">
@@ -90,12 +192,7 @@ function OrderSteps(props) {
               </button>
             )}
             {step == 4 && (
-              <button
-                className="btn"
-                onClick={() => {
-                  changeStep(true)
-                }}
-              >
+              <button className="btn" onClick={onSubmit}>
                 送出
               </button>
             )}
@@ -104,6 +201,13 @@ function OrderSteps(props) {
       </div>
     </>
   )
+  const logout = (
+    <>
+      <div className="mt-5 pt-5"></div>
+      <p>請先登入</p>
+    </>
+  )
+  return auth ? login : logout
 }
 
-export default OrderSteps
+export default withRouter(OrderSteps)

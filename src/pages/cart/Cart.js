@@ -97,8 +97,9 @@ function Cart() {
     const index = currentCart.findIndex(
       (v) => v.id === item.id
     )
-    currentCart.splice(index,1)
-      console.log('index',index)
+    currentCart.splice(index, 1)
+    // console.log('index', index)
+  
     localStorage.setItem(
       'cart',
       JSON.stringify(currentCart)

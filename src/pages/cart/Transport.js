@@ -15,7 +15,7 @@ function Transport(props) {
 
     const newCart = localStorage.getItem('cart') || '[]'
 
-    console.log(JSON.parse(newCart))
+    // console.log(JSON.parse(newCart))
 
     setMycart(JSON.parse(newCart))
   }
@@ -50,7 +50,7 @@ function Transport(props) {
       }
     }
 
-    console.log(newMycartDisplay)
+    // console.log(newMycartDisplay)
     setMycartDisplay(newMycartDisplay)
   }, [mycart])
 
@@ -59,7 +59,7 @@ function Transport(props) {
     item,
     isAdded = true
   ) => {
-    console.log(item, isAdded)
+    // console.log(item, isAdded)
     const currentCart =
       JSON.parse(localStorage.getItem('cart')) || []
 
@@ -68,7 +68,7 @@ function Transport(props) {
       (v) => v.id === item.id
     )
 
-    console.log('index', index)
+    // console.log('index', index)
     // found: index! == -1
     if (index > -1) {
       isAdded
@@ -305,7 +305,7 @@ function Transport(props) {
                           <td className="text-center">
                             {item.amount * item.price}
                           </td>
-                          {console.log(localStorage)}
+                          {/* {console.log(localStorage)} */}
                         </tr>
                       </>
                     )

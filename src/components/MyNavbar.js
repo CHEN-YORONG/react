@@ -18,7 +18,7 @@ function MyNavbar(props) {
         style={{ background: 'black' }}
         className="mb-5"
       >
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="/">
           <div className="ronglogo">
             <img src="/img/LOGO.jpg" alt="" />
           </div>
@@ -34,7 +34,9 @@ function MyNavbar(props) {
                 <i class="fas fa-search"></i>
               </p>
             </Nav.Link>
-
+            <Nav.Link as={NavLink} to="/">
+              <p>首頁</p>
+            </Nav.Link>
             <Nav.Link as={NavLink} to="/about">
               <p>設計師</p>
             </Nav.Link>
@@ -94,7 +96,12 @@ function MyNavbar(props) {
             </NavDropdown>
           </Nav>
           <Nav className="mt-3 mr-3">
-            <Nav.Link href="#deets">
+            <Nav.Link
+              as={NavLink}
+              to="/aboutdetail"
+              eventKey={2}
+              href="#memes"
+            >
               <p>
                 <i class="far fa-user"></i>
               </p>

@@ -27,6 +27,7 @@ import OrderStep from './pages/cart/OrderStep'
 //測試加入購物車
 import ProductList from './pages/ProductList'
 import Cart from './pages/cart/Cart'
+import Aboutdetail from './pages/Aboutdetail'
 // 組合用元件
 import MyNavbar from './components/MyNavbar'
 import MyFooter from './components/MyFooter'
@@ -69,14 +70,14 @@ function App() {
               <Route path="/cart">
                 <Cart />
               </Route>
-              <Route path="/productlist">
+              <Route path="/productlist/">
                 <ProductList
                   cartCount={cartCount}
                   setCartCount={setCartCount}
                 />
               </Route>
               <Route path="/order-steps">
-                <OrderStep />
+                <OrderStep auth={auth}/>
               </Route>
               <Route path="/check-order">
                 <CheckOrder />
@@ -113,8 +114,11 @@ function App() {
                 {/* 利用props傳入頁面元件狀態 */}
                 <Login auth={auth} setAuth={setAuth} />
               </Route>
+              <Route path="/aboutdetail">
+                <Aboutdetail auth={auth} setAuth={setAuth} />
+              </Route>
               <Route path="/about">
-                <About auth={auth} />
+                <About auth={auth} setAuth={setAuth} />
               </Route>
               <Route exact path="/">
                 <Home auth={auth} />
