@@ -16,7 +16,8 @@ function OrderSteps(props) {
   const [mycart, setMycart] = useState([])
   const [step, setStep] = useState(1)
   const [mycartDisplay, setMycartDisplay] = useState([])
-
+  console.log('mycartDisplay:', mycartDisplay)
+  var temporderid = 0
   const cart = (
     <>
       {/* <h2>購物車</h2> */}
@@ -70,20 +71,34 @@ function OrderSteps(props) {
       total += items[i].amount * items[i].price
     }
     return total
-
   }
   useEffect(() => {
     getCartFromLocalStorage()
     getMemberLocalStorage()
   }, [])
-  const onSubmit = async () => {
-    //json
-    //  `member_sid`, `name`, `mobile`, `orderprice`, `delivery`, `receiver`, `delivery_address`, `card`,
+  const fetchOrderDetail = async () => {
+    const productr = await fetch(
+      'http://localhost:3001/order_detail',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          orderDetail: mycartDisplay,
+          order_id: datacard.order_id,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    const productdata = await productr.json()
+  }
+  const fetchOrder = async () => {
     const dataObj = {
       member_sid: member.id,
+      order_sid: datacard.order_id,
       nickname: member.nickname,
       mobile: datacard.mobile,
-      orderprice: 1424,
+      orderprice: sum(mycartDisplay),
       delivery: paydata,
       receiver: datacard.receiver,
       delivery_address: datacard.delivery_address,
@@ -96,9 +111,11 @@ function OrderSteps(props) {
         'Content-Type': 'application/json',
       },
     })
-    const data = await r.json()
-    console.log(data)
-
+    const orderdata = await r.json()
+  }
+  const onSubmit = () => {
+    fetchOrder()
+    fetchOrderDetail()
     localStorage.removeItem('cart')
     alert('謝謝惠顧')
     props.history.push('/about')
