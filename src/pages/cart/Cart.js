@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
-function Cart() {
+function Cart(props) {
+  const { cartCount, setCartCount } = props
   const [mycart, setMycart] = useState([])
   const [dataLoading, setDataLoading] = useState(false)
   const [mycartDisplay, setMycartDisplay] = useState([])
@@ -8,17 +10,7 @@ function Cart() {
   function getCartFromLocalStorage() {
     // 開啟載入的指示圖示
     setDataLoading(true)
-
     const newCart = localStorage.getItem('cart') || '[]'
-
-    // console.log(JSON.parse(newCart))
-
-    // const newCart = localStorage.getItem('cart') || '[]'
-    // console.log('newCart[0]:',newCart[0]);
-    // console.log('JSON.parse(newCart):',JSON.parse(newCart))
-    // var cartArr=JSON.parse(newCart)
-    // setMycart(JSON.parse(newCart))
-
     setMycart(JSON.parse(newCart))
   }
 
@@ -30,7 +22,6 @@ function Cart() {
   // componentDidUpdate
   useEffect(() => {
     setTimeout(() => setDataLoading(false), 1000)
-
     // mycartDisplay運算
     let newMycartDisplay = []
 
@@ -54,10 +45,17 @@ function Cart() {
         newMycartDisplay = [...newMycartDisplay, newItem]
       }
     }
-
     // console.log(newMycartDisplay)
     setMycartDisplay(newMycartDisplay)
   }, [mycart])
+  // 計算總價用的函式
+  const sum = (items) => {
+    let total = 0
+    for (let i = 0; i < items.length; i++) {
+      total += items[i].amount * items[i].price
+    }
+    return total
+  }
 
   // 更新購物車中的商品數量
   const updateCartToLocalStorage = (
@@ -89,7 +87,33 @@ function Cart() {
     // 設定資料
     setMycart(currentCart)
   }
+  // 更新購物車 list中的商品數量
+  const updateListToLocalStorage = (
+    item,
+    isAdded = true
+  ) => {
+    // console.log(item, isAdded)
+    const currentList =
+      JSON.parse(localStorage.getItem('list')) || []
 
+    // find if the product in the localstorage with its id
+    const index = currentList.findIndex(
+      (v) => v.id === item.id
+    )
+
+    // console.log('index:', index)
+    // found: index! == -1
+    if (index > -1) {
+      isAdded
+        ? currentList[index].amount++
+        : currentList[index].amount--
+    }
+
+    localStorage.setItem(
+      'list',
+      JSON.stringify(currentList)
+    )
+  }
   const deleteCartToLocalStorage = (item) => {
     const currentCart =
       JSON.parse(localStorage.getItem('cart')) || []
@@ -99,7 +123,7 @@ function Cart() {
     )
     currentCart.splice(index, 1)
     // console.log('index', index)
-  
+
     localStorage.setItem(
       'cart',
       JSON.stringify(currentCart)
@@ -107,15 +131,21 @@ function Cart() {
 
     // 設定資料
     setMycart(currentCart)
-  }
+    setCartCount(cartCount - 1)
 
-  // 計算總價用的函式
-  const sum = (items) => {
-    let total = 0
-    for (let i = 0; i < items.length; i++) {
-      total += items[i].amount * items[i].price
-    }
-    return total
+    const currentList =
+      JSON.parse(localStorage.getItem('list')) || []
+
+    const Listindex = currentList.findIndex(
+      (v) => v.id === item.id
+    )
+    currentList.splice(Listindex, 1)
+    // console.log('index', index)
+
+    localStorage.setItem(
+      'list',
+      JSON.stringify(currentList)
+    )
   }
 
   const loading = (
@@ -130,11 +160,20 @@ function Cart() {
 
   const display = (
     <>
-      <div className="container mt-5 pt-5 mb-5 pb-5 ">
+      <div className="container mb-5">
         <div className="row">
           <p className="ml-3">
-            {' '}
-            HOME / 商品 / 確認購買明細
+            <Link to="/" className="mr-1">
+              首頁
+            </Link>
+            /
+            <Link to="/product" className="mr-1 ml-1">
+              產品
+            </Link>
+            /
+            <span className="myfontcolor">
+              確認購買明細
+            </span>
           </p>
         </div>
       </div>
@@ -144,28 +183,30 @@ function Cart() {
             <p className="rongtextcolor">確認購買明細</p>
           </div>
           <div className="rongboxborder">
-            <p> 配送與付款方式</p>
+            <p className="rocky-fix2"> 配送與付款方式</p>
           </div>
           <div className="rongboxborder">
-            <p>填寫收件資料</p>
+            <p className="rocky-fix2">填寫收件資料</p>
           </div>
           <div className="rongboxborder">
-            <p>確認訂單</p>
+            <p className="rocky-fix2">確認訂單</p>
           </div>
         </div>
       </div>
       <div className="container mt-5 pt-5">
         <div className="d-flex justify-content-center">
           <div className="w875 borderbottom">
-            <p>CHECK YOUR ORDER 確認購買明細</p>
+            <p className="rocky-fix2">
+              Check Your Order 確認購買明細
+            </p>
           </div>
         </div>
       </div>
       <div className="container">
         <div className="row justify-content-center">
           <div className="rongproducttype d-flex">
-            <table className="table  col ">
-              <thead className="table-dark">
+            <table className="table col">
+              <thead className="table-dark rocky-fix3">
                 <tr>
                   <th scope="col">商品名稱</th>
                   <th scope="col" className="text-center">
@@ -186,67 +227,89 @@ function Cart() {
                 </tr>
               </thead>
               <tbody>
-                {mycartDisplay.map((item, index) => {
+                {mycartDisplay.map((item, i) => {
                   return (
-                    <>
-                      <tr>
-                        <td className="d-flex">
-                          <div>
-                            <img
-                              src="./img/PD.jpg"
-                              alt=""
-                            />
-                          </div>
-                          <div className="ml-5">
-                            {item.name}
-                          </div>
-                        </td>
-                        <td className="text-center">
-                          黃 over 100cm{' '}
-                        </td>
-                        <td className="text-center">
-                          {' '}
-                          <button
+                    <tr key={i}>
+                      <td className="d-flex">
+                        <div>
+                          <img src={item.image} alt="" />
+                        </div>
+                        <div className="ml-5 mt-4 rocky-fix2">
+                          {item.name}
+                        </div>
+                      </td>
+                      <td className="text-center rocky-fix2">
+                        <div className=" mt-4">
+                          {item.size}
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className=" mt-4">
+                          <i
+                            style={{
+                              fontSize: '0.5rem',
+                              marginRight: '10px',
+                              color: '#1d3124',
+                            }}
                             onClick={() => {
                               if (item.amount === 1) return
                               updateCartToLocalStorage(
                                 item,
                                 false
                               )
+                              if (item.amount === 1) return
+                              updateListToLocalStorage(
+                                item,
+                                false
+                              )
                             }}
-                          >
-                            -
-                          </button>
-                          {item.amount}
-                          <button
-                            onClick={() =>
+                            className="fas fa-caret-square-left"
+                          ></i>
+                          <span className="">
+                            {item.amount}
+                          </span>
+                          <i
+                            style={{
+                              fontSize: '0.5rem',
+                              marginLeft: '10px',
+                              color: '#1d3124',
+                            }}
+                            onClick={() => {
                               updateCartToLocalStorage(
                                 item,
                                 true
                               )
-                            }
-                          >
-                            +
-                          </button>
-                        </td>
-                        <td className="text-center">
-                          {item.price}
-                        </td>
-                        <td className="text-center">
-                          {item.amount * item.price}
-                        </td>
-                        <td className="text-center">
-                          <button
+                              updateListToLocalStorage(
+                                item,
+                                true
+                              )
+                            }}
+                            className="fas fa-caret-square-right"
+                          ></i>
+                        </div>
+                      </td>
+                      <td className="text-center mt-4">
+                        <div className=" mt-4 rocky-fix2">
+                          NT$ {item.price}
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className=" mt-4 rocky-fix2">
+                          NT$ {item.amount * item.price}
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className=" mt-4">
+                          <i
+                            style={{ color: '#e59560' }}
                             onClick={() =>
                               deleteCartToLocalStorage(item)
                             }
-                          >
-                            <i className="fas fa-trash"></i>
-                          </button>
-                        </td>
-                        {/* {console.log(localStorage)} */}
-                      </tr>
-                    </>
+                            className="fas fa-trash"
+                          ></i>
+                        </div>
+                      </td>
+                    </tr>
                   )
                 })}
               </tbody>
@@ -254,9 +317,14 @@ function Cart() {
           </div>
         </div>
       </div>
-      <div className="container mt-5 pt-4">
-        <div className="row justify-content-center">
-          <p>小計金額 : {sum(mycartDisplay)}</p>
+      <div className="container mt-1  w875 ">
+        <div className="row justify-content-end rongtotal ml-auto mr-1 pt-1 rongmoney2">
+          <div className="rongsettotal">
+            <p className="rocky-fix2">總計</p>
+          </div>
+          <div className="rongsettotal">
+            <span>NT ${parseInt(sum(mycartDisplay))}</span>
+          </div>
         </div>
       </div>
       <div className="mb-5"></div>

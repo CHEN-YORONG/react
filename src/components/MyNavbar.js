@@ -1,124 +1,140 @@
-import React from 'react'
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
-import './navstyle.css'
+import React, { useState } from 'react'
+import { Navbar, Nav } from 'react-bootstrap'
+import '../styles/navstyle.css'
 // 要使用能有active css效果的NavLink元件
-import { NavLink } from 'react-router-dom'
+import { NavLink, withRouter } from 'react-router-dom'
 
 function MyNavbar(props) {
-  const { auth, cartCount } = props
+  const { auth, setAuth, track, cartCount, id } = props
+  const [member, setMember] = useState([])
+
+  const logout = () => {
+    setAuth(false)
+    deleteMemberLocalStorage()
+    props.history.push('/')
+  }
+
+  function deleteMemberLocalStorage() {
+    localStorage.removeItem('token')
+    const newMember =
+      localStorage.removeItem('member') || '[]'
+    setMember(JSON.parse(newMember))
+    localStorage.removeItem('list')
+  }
 
   return (
     <>
       <Navbar
         collapseOnSelect
         expand="lg"
-        // bg="primary"
+        bg="primary"
         variant="dark"
-        fixed="top"
-        style={{ background: 'black' }}
-        className="mb-5"
+        // fixed="top"
       >
-        <Navbar.Brand href="/">
+        <Navbar.Brand href="#home">
           <div className="ronglogo">
-            <img src="/img/LOGO.jpg" alt="" />
+            <img
+              src="http://localhost:3000/image/logo.svg"
+              alt=""
+            />
           </div>
         </Navbar.Brand>
-
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mx-auto mt-3">
             {/* 利用as屬性來作選單link的整合 */}
             {/* 參考：https://react-bootstrap.github.io/components/navs/#nav-link-props */}
-            <Nav.Link as={NavLink} to="/about">
-              <p>
-                <i class="fas fa-search"></i>
-              </p>
-            </Nav.Link>
-            <Nav.Link as={NavLink} to="/">
+            {/* 首頁 */}
+            <Nav.Link as={NavLink} exact to="/">
               <p>首頁</p>
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/about">
+            {/* 設計師 */}
+            <Nav.Link
+              as={NavLink}
+              exact
+              to="/product/detail"
+            >
               <p>設計師</p>
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/productlist">
+            {/* 作品集 */}
+            <Nav.Link as={NavLink} to="/product">
               <p>作品集</p>
             </Nav.Link>
-            {auth && (
+            {/* 聯繫我們 */}
+            <Nav.Link as={NavLink} to="/member">
+              <p>聯繫我們</p>
+            </Nav.Link>
+            {/* {auth && (
               <Nav.Link as={NavLink} to="/member">
                 <p>聯繫我們</p>
               </Nav.Link>
-            )}
+            )} */}
+            {/* 合作邀約 */}
             <Nav.Link as={NavLink} to="/productcategory">
               <p>合作邀約</p>
             </Nav.Link>
+            {/* 設計新知 */}
             <Nav.Link as={NavLink} to="/student">
               <p>設計新知</p>
             </Nav.Link>
-            <NavDropdown
-              title="購物車"
-              id="collasible-nav-dropdown"
-              style={{
-                color: 'black',
-                // fontSize: '1.6rem' ,
-              }}
+            {/* 調整版面用 */}
+            <Nav.Link
+              as={NavLink}
+              to="/about"
+              className="rocky-mobile"
             >
-              <NavDropdown.Item as={NavLink} to="/cart">
-                購物車
-              </NavDropdown.Item>
-              <NavDropdown.Item
-                as={NavLink}
-                to="/transport"
-              >
-                配送
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item as={NavLink} to="/receive">
-                收件
-              </NavDropdown.Item>
-              <NavDropdown.Item
-                as={NavLink}
-                to="/receive-card"
-              >
-                收件-信用卡
-              </NavDropdown.Item>
-              <NavDropdown.Item
-                as={NavLink}
-                to="/check-order"
-              >
-                確認訂單
-              </NavDropdown.Item>
-              <NavDropdown.Item
-                as={NavLink}
-                to="/order-list"
-              >
-                查詢訂單
-              </NavDropdown.Item>
-            </NavDropdown>
+              <p className="rocky-hide">123</p>
+            </Nav.Link>
           </Nav>
           <Nav className="mt-3 mr-3">
-            <Nav.Link
-              as={NavLink}
-              to="/aboutdetail"
-              eventKey={2}
-              href="#memes"
-            >
+            {auth ? (
+              <>
+                <Nav.Link
+                  as={NavLink}
+                  to={'/member_center/' + id.sid}
+                >
+                  <p>會員中心</p>
+                </Nav.Link>
+                <Nav.Link>
+                  <p onClick={logout}>登出</p>
+                </Nav.Link>
+              </>
+            ) : (
+              ''
+            )}
+
+            {auth ? (
+              ''
+            ) : (
+              <>
+                <Nav.Link as={NavLink} to="/login">
+                  <p>
+                    <i className="far fa-user"></i>
+                  </p>
+                </Nav.Link>
+              </>
+            )}
+
+            <Nav.Link href="#deets">
               <p>
-                <i class="far fa-user"></i>
+                <i className="far fa-heart"></i>
               </p>
             </Nav.Link>
-            <Nav.Link
-              as={NavLink}
-              to="/order-steps"
-              eventKey={2}
-              href="#memes"
-            >
+            <div className="cart-circle mt-2">
+              <div className="cart-number ">
+                <p>{auth && track ? track : 0}</p>
+              </div>
+            </div>
+            <Nav.Link as={NavLink} to="/order-steps">
               <p>
-                <i class="fas fa-shopping-cart"></i>{' '}
-                <span className="badge badge-light">
-                  {cartCount}
-                </span>
+                <i className="fas fa-shopping-cart"></i>
               </p>
             </Nav.Link>
+            <div className="cart-circle mt-2">
+              <div className="cart-number ">
+                <p>{auth && cartCount ? cartCount : 0}</p>
+              </div>
+            </div>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -126,4 +142,4 @@ function MyNavbar(props) {
   )
 }
 
-export default MyNavbar
+export default withRouter(MyNavbar)

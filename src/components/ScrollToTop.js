@@ -5,6 +5,11 @@ import { withRouter } from 'react-router-dom'
 class ScrollToTop extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.location !== prevProps.location) {
+      if (
+        this.props.location.pathname === '/product/detail'
+      ) {
+        return false
+      }
       window.scrollTo(0, 0)
     }
   }

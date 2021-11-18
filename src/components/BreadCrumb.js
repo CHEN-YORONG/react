@@ -4,14 +4,23 @@ function BreadCrumb(props) {
   console.log(props)
   const { location } = props
 
-  const pathnameList = ['/about', '/login', '/productcategory']
+  const pathnameList = [
+    '/about',
+    '/login',
+    '/productcategory',
+  ]
   const pathnameTextList = ['關於我們', '登入', '產品分類']
 
   const convertPathnameToText = (pathname) => {
-    const index = pathnameList.findIndex((v) => v === pathname)
+    const index = pathnameList.findIndex(
+      (v) => v === pathname
+    )
     if (index > -1)
       return (
-        <li className="breadcrumb-item active" aria-current="page">
+        <li
+          className="breadcrumb-item active"
+          aria-current="page"
+        >
           {pathnameTextList[index]}
         </li>
       )

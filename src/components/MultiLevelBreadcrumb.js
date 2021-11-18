@@ -3,6 +3,7 @@ import React from 'react'
 import { withRouter, Link } from 'react-router-dom'
 // 中文路徑對照陣列，移出到config/index.js中設定
 import { pathnameList, pathnameTextList } from '../config'
+import '../styles/breadcrumb-background.css'
 
 function MultiLevelBreadcrumb(props) {
   const { location } = props
@@ -40,7 +41,7 @@ function MultiLevelBreadcrumb(props) {
     // '/product/baby/birth' -> ['','product','baby', 'birth']
     const pathArray = pathnameList[index].split('/')
 
-    console.log(textArray, pathArray)
+    // console.log(textArray, pathArray)
 
     const listArray = textArray.map((v, i, array) => {
       if (i === 0) return ''
@@ -48,16 +49,16 @@ function MultiLevelBreadcrumb(props) {
       if (i === array.length - 1) {
         return (
           <li
-            className="breadcrumb-item active"
+            key={i}
+            className="breadcrumb-item active try"
             aria-current="page"
           >
             {v}
           </li>
         )
       }
-
       return (
-        <li className="breadcrumb-item">
+        <li key={i} className="breadcrumb-item try">
           <Link to={pathArray.slice(0, i + 1).join('/')}>
             {v}
           </Link>
@@ -71,9 +72,11 @@ function MultiLevelBreadcrumb(props) {
   return (
     <>
       <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <Link to="/">首頁</Link>
+        <ol className="breadcrumb breadcrumb-background">
+          <li className="breadcrumb-item try">
+            <Link to="/" className="try">
+              首頁
+            </Link>
           </li>
           {formatText(findPathnameIndex(location.pathname))}
         </ol>
